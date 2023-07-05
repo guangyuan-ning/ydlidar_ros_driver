@@ -3,9 +3,7 @@
 <package format="2">
   <name>ydlidar_ros2_driver</name>
   <version>1.0.1</version>
-  <description>
-    The ROS2 device driver for YDLIDAR LIDARS
-  </description>
+  <description>The ROS2 device driver for YDLIDAR LIDARS</description>
   <maintainer email="support@ydlidar.com">Tony</maintainer>
   <license>MIT</license>
 
