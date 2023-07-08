@@ -1,187 +1,109 @@
+# 功能介绍
+
+YDLIDAR ROS2驱动，以ROS2标准消息格式发送激光雷达数据。
+
+# 物品清单
+
+完善的产品型号请以[ydlidar官网]（http://ydlidar.cn/lidars/triangulation.html）为准，这里以YDLIDAR X3为例进行演示。
+
 ![YDLIDAR](images/YDLidar.jpg  "YDLIDAR")
-# YDLIDAR ROS2 Driver
 
-ydlidar_ros2_driver is a new ros package, which is designed to gradually become the standard driver package for ydlidar devices in the ros2 environment.
+| 物料选项    | 清单      | 
+| ------- | ------------ | 
+| RDK X3  | [购买链接](https://developer.horizon.ai/sunrise) | 
+| YDLIDAR X3 | [购买链接](http://ydlidar.cn/products/view/6.html) | 
 
-## How to [install ROS2](https://index.ros.org/doc/ros2/Installation)
-[ubuntu](https://index.ros.org/doc/ros2/Installation/Dashing/Linux-Install-Debians/)
+# 使用方法
 
-[windows](https://index.ros.org/doc/ros2/Installation/Dashing/Windows-Install-Binary/)
+## 准备工作
 
-## How to Create a ROS2 workspace
-[Create a workspace](https://index.ros.org/doc/ros2/Tutorials/Colcon-Tutorial/#create-a-workspace)
+1. 地平线RDK已烧录好地平线提供的Ubuntu 20.04系统镜像。
 
+2. YDLIDAR正确链接RDK X3
 
-## Compile & Install YDLidar SDK
+## 安装YDLIDAR驱动
 
-ydlidar_ros2_driver depends on YDLidar-SDK library. If you have never installed YDLidar-SDK library or it is out of date, you must first install YDLidar-SDK library. If you have installed the latest version of YDLidar-SDK, skip this step and go to the next step.
+通过终端或者VNC连接RDK X3，执行以下命令
 
-1. Download or clone the [YDLIDAR/YDLidar-SDK](https://github.com/YDLIDAR/YDLidar-SDK) repository on GitHub.
-2. Compile and install the YDLidar-SDK under the ***build*** directory following `README.md` of YDLIDAR/YDLidar-SDK.
-
-## Clone ydlidar_ros2_driver
-
-1. Clone ydlidar_ros2_driver package for github : 
-
-   `git clone https://github.com/YDLIDAR/ydlidar_ros2_driver.git ydlidar_ros2_ws/src/ydlidar_ros2_driver`
-
-2. Build ydlidar_ros2_driver package :
-
-   ```
-   cd ydlidar_ros2_ws
-   colcon build --symlink-install
-   ```
-   Note: install colcon [see](https://index.ros.org/doc/ros2/Tutorials/Colcon-Tutorial/#install-colcon)
-
-   ![CMAKE Finished](images/finished.png  "CMAKE Finished")
-
-   <font color=Red size=4>>Note: If the following error occurs, Please install  [YDLIDAR/YDLidar-SDK](https://github.com/YDLIDAR/YDLidar-SDK) first.</font>
-
-   ![CMAKE ERROR](images/cmake_error.png  "CMAKE ERROR")
-
-3. Package environment setup :
-
-   `source ./install/setup.bash`
-
-    Note: Add permanent workspace environment variables.
-    It's convenientif the ROS2 environment variables are automatically added to your bash session every time a new shell is launched:
-    ```
-    $echo "source ~/ydlidar_ros2_ws/install/setup.bash" >> ~/.bashrc
-    $source ~/.bashrc
-    ```
-4. Confirmation
-    To confirm that your package path has been set, printenv the `grep -i ROS` variable.
-    ```
-    $ printenv | grep -i ROS
-    ```
-    You should see something similar to:
-        `OLDPWD=/home/tony/ydlidar_ros2_ws/install`
-
-5. Create serial port Alias [optional] 
-    ```
-	$chmod 0777 src/ydlidar_ros2_driver/startup/*
-	$sudo sh src/ydlidar_ros2_driver/startup/initenv.sh
-    ```
-    Note: After completing the previous operation, replug the LiDAR again.
-	
-## Configure LiDAR [paramters](params/ydlidar.yaml)
-```
-ydlidar_ros2_driver_node:
-  ros__parameters:
-    port: /dev/ttyUSB0
-    frame_id: laser_frame
-    ignore_array: ""
-    baudrate: 230400
-    lidar_type: 1
-    device_type: 0
-    sample_rate: 9
-    abnormal_check_count: 4
-    resolution_fixed: true
-    reversion: true
-    inverted: true
-    auto_reconnect: true
-    isSingleChannel: false
-    intensity: false
-    support_motor_dtr: false
-    angle_max: 180.0
-    angle_min: -180.0
-    range_max: 64.0
-    range_min: 0.01
-    frequency: 10.0
-    invalid_range_is_inf: false
+```bash
+sudo apt install -y tros-test-body-tracking
 ```
 
-## Run ydlidar_ros2_driver
+## 运行YDLIDAR
 
-##### Run ydlidar_ros2_driver using launch file
+```bash
+source /opt/tros/setup.bash
+ros2 launch ydlidar_ros2_driver ydlidar_launch.py
+```
 
-The command format is : 
+## 查看雷达数据
 
- `ros2 launch ydlidar_ros2_driver [launch file].py`
+### 方式1 命令行方式
 
-1. Connect LiDAR uint(s).
-   ```
-   ros2 launch ydlidar_ros2_driver ydlidar_launch.py 
-   ```
-   or 
+新打开一个终端，在里面输入以下命令查看激光雷达输出数据
 
-   ```
-   launch $(ros2 pkg prefix ydlidar_ros2_driver)/share/ydlidar_ros2_driver/launch/ydlidar.py 
-   ```
-2. RVIZ 
-   ```
-   ros2 launch ydlidar_ros2_driver ydlidar_launch_view.py 
-   ```
-    ![View](images/view.png  "View")
+```bash
+source /opt/tros/setup.bash
+ros2 topic echo /scan
+```
 
-3. echo scan topic
-   ```
-   ros2 run ydlidar_ros2_driver ydlidar_ros2_driver_client or ros2 topic echo /scan
-   ```
+### 方式2 RVIZ方式
 
-#####  Launch file introduction
+在PC或者支持RVIZ的环境下安装ROS2，这里以foxy版本为例，运行
 
-The driver offers users a wealth of options when using different launch file. The launch file directory    
+```bash
+source /opt/ros/foxy/setup.bash
+ros2 run rviz2 rviz2
+```
 
-is `"ydlidar_ros2_ws/src/ydlidar_ros2_driver/launch"`. All launch files are listed as below : 
+添加LaserScan，配置Reliability Policy为System Default
 
-| launch file               | features                                                     |
-| ------------------------- | ------------------------------------------------------------ |
-| ydlidar.py         | Connect to defualt paramters<br/>Publish LaserScan message on `scan` topic |
-| ydlidar_launch.py         | Connect ydlidar.yaml Lidar specified by configuration parameters<br/>Publish LaserScan message on `scan` topic |
-| ydlidar_launch_view.py         | Connect ydlidar.yaml Lidar specified by configuration parameters and setup RVIZ<br/>Publish LaserScan message on `scan` topic |
+![RVIZ](images/rviz.png  "CONFIG")
+
+设置Fixed Frame为base_link或者laser_link即可看到激光雷达采集数据
+
+![RVIZ](images/lidar_rviz.png  "CONFIG")
 
 
+# 接口说明
 
-## Publish Topic
+## 话题
+
+### 发布话题
 | Topic                | Type                    | Description                                      |
 |----------------------|-------------------------|--------------------------------------------------|
-| `scan`               | sensor_msgs/LaserScan   | 2D laser scan of the 0-angle ring                |
+| `scan`               | sensor_msgs/LaserScan   | 二维激光雷达扫描数据                |
 
-## Subscribe Service
+## 服务
+
+## 订阅服务
 | Service                | Type                    | Description                                      |
 |----------------------|-------------------------|--------------------------------------------------|
-| `stop_scan`          | std_srvs::Empty   | turn off lidar                                         |
-| `start_scan`         | std_srvs::Empty   | turn on lidar                                          |
+| `stop_scan`          | std_srvs::Empty   | 关闭雷达                                         |
+| `start_scan`         | std_srvs::Empty   | 打开雷达                                          |
 
-
-
-## Configure ydlidar_ros_driver internal parameter
-
-The ydlidar_ros2_driver internal parameters are in the launch file, they are listed as below :
-
+## 参数
 | Parameter name | Data Type | detail                                                       |
 | -------------- | ------- | ------------------------------------------------------------ |
-| port         | string | Set Lidar the serial port or IP address <br/>it can be set to `/dev/ttyUSB0`, `192.168.1.11`, etc. <br/>default: `/dev/ydlidar` |
-| frame_id     | string | Lidar TF coordinate system name. <br/>default: `laser_frame` |
-| ignore_array | string | LiDAR filtering angle area<br/>eg: `-90, -80, 30, 40` |
-| baudrate     | int | Lidar baudrate or network port. <br/>default: `230400` |
-| lidar_type     | int | Set lidar type <br/>0 -- TYPE_TOF<br/>1 -- TYPE_TRIANGLE<br/>2 -- TYPE_TOF_NET <br/>default: `1` |
-| device_type     | int | Set device type <br/>0 -- YDLIDAR_TYPE_SERIAL<br/>1 -- YDLIDAR_TYPE_TCP<br/>2 -- YDLIDAR_TYPE_UDP <br/>default: `0` |
-| sample_rate     | int | Set Lidar Sample Rate. <br/>default: `9` |
-| abnormal_check_count     | int | Set the number of abnormal startup data attempts. <br/>default: `4` |
-| fixed_resolution     | bool | Fixed angluar resolution. <br/>default: `true` |
-| reversion     | bool | Reversion LiDAR. <br/>default: `true` |
-| inverted     | bool | Inverted LiDAR.<br/>false -- ClockWise.<br/>true -- CounterClockWise  <br/>default: `true` |
-| auto_reconnect     | bool | Automatically reconnect the LiDAR.<br/>true -- hot plug. <br/>default: `true` |
-| isSingleChannel     | bool | Whether LiDAR is a single-channel.<br/>default: `false` |
-| intensity     | bool | Whether LiDAR has intensity.<br/>true -- G2 LiDAR.<br/>default: `false` |
-| support_motor_dtr     | bool | Whether the Lidar can be started and stopped by Serial DTR.<br/>default: `false` |
-| angle_min     | float | Minimum Valid Angle.<br/>default: `-180` |
-| angle_max     | float | Maximum Valid Angle.<br/>default: `180` |
-| range_min     | float | Minimum Valid range.<br/>default: `0.1` |
-| range_max     | float | Maximum Valid range.<br/>default: `16.0` |
-| frequency     | float | Set Scanning Frequency.<br/>default: `10.0` |
-| invalid_range_is_inf     | bool | Invalid Range is inf.<br/>true -- inf.<br/>false -- 0.0.<br/>default: `false` |
-More paramters details, see [here](details.md)
-
-## Contact EAI
-![Development Path](images/EAI.png)
-
-If you have any extra questions, please feel free to [contact us](http://www.ydlidar.cn/cn/contact)
-
-
-
-
-
+| port         | string | 设置激光雷达设备端口号<br/>例如串口 `/dev/ttyUSB0`, 网口`192.168.1.11`，默认值`/dev/ydlidar` |
+| frame_id     | string | frame名称默认值: `laser_frame` |
+| ignore_array | string | 过滤测量点<br/>eg: `-90, -80, 30, 40` |
+| baudrate     | int | 串口波特率 <br/>默认值: `230400` |
+| lidar_type     | int | 雷达型号 <br/>0 -- TYPE_TOF<br/>1 -- TYPE_TRIANGLE<br/>2 -- TYPE_TOF_NET <br/>默认值: `1` |
+| device_type     | int | 设备通信类型 <br/>0 -- YDLIDAR_TYPE_SERIAL<br/>1 -- YDLIDAR_TYPE_TCP<br/>2 -- YDLIDAR_TYPE_UDP <br/>默认值: `0` |
+| sample_rate     | int | 采样频率. <br/>默认值: `9` |
+| abnormal_check_count     | int | 启动异常时重试次数 <br/>默认值: `4` |
+| fixed_resolution     | bool | 使能修正角分辨率 <br/>默认值: `true` |
+| reversion     | bool | 改变扫描方向. <br/>默认值: `true` |
+| inverted     | bool | 改变扫描方向，顺时针或者逆时针.<br/>false -- ClockWise.<br/>true -- CounterClockWise  <br/>默认值: `true` |
+| auto_reconnect     | bool | 自动重新连接雷达.<br/>true -- hot plug. <br/>默认值: `true` |
+| isSingleChannel     | bool | 是否单通道.<br/>默认值: `false` |
+| intensity     | bool | 激光雷达是否输出测量强度.<br/>true -- G2 LiDAR.<br/>默认值: `false` |
+| support_motor_dtr     | bool | 激光雷达是否可以通过串行DTR启动和停止.<br/>默认值: `false` |
+| angle_min     | float | 最小测量角度.<br/>默认值: `-180` |
+| angle_max     | float | 最大测量角度.<br/>默认值: `180` |
+| range_min     | float | 最小测量范围.<br/>默认值: `0.1` |
+| range_max     | float | 最大测量范围.<br/>默认值: `16.0` |
+| frequency     | float | 扫描频率.<br/>默认值: `10.0` |
+| invalid_range_is_inf     | bool | Invalid Range is inf.<br/>true -- inf.<br/>false -- 0.0.<br/>默认值: `false` |
 
