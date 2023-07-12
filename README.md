@@ -4,7 +4,7 @@ YDLIDAR ROS2驱动，以ROS2标准消息格式发送激光雷达数据。
 
 # 物品清单
 
-完善的产品型号请以[ydlidar官网]（http://ydlidar.cn/lidars/triangulation.html）为准，这里以YDLIDAR X3为例进行演示。
+完善的产品型号请以[ydlidar官网](http://ydlidar.cn/lidars/triangulation.html)为准，这里以YDLIDAR X3为例进行演示。
 
 ![YDLIDAR](images/YDLidar.jpg  "YDLIDAR")
 
@@ -26,8 +26,10 @@ YDLIDAR ROS2驱动，以ROS2标准消息格式发送激光雷达数据。
 通过终端或者VNC连接RDK X3，执行以下命令
 
 ```bash
-sudo apt install -y tros-test-body-tracking
+sudo apt update
+sudo apt install -y tros-ydlidar-ros2-driver
 ```
+**注意：如果安装s时YDLIDR已连接在RDK X3上，则安装完后需要重新拔插一次**
 
 ## 运行YDLIDAR
 
